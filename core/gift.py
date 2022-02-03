@@ -1,5 +1,3 @@
-import re
-
 class Gift:
     def __init__(self, string):
         self.string = string
@@ -7,13 +5,17 @@ class Gift:
     def parse(self):
         patterns = [
             r"I just received a gift from ",
-            r" via Throne Gifts: "
+            r" via Throne Gifts: ",
+            r" Thank you!… "
         ]
         out = self.string
         for i in patterns:
             out = out.replace(i, "()")
-        out = out.split(" Thank you! ")[0]
-        li = out[1:].split("()")
+        try:
+            out = out.split("")[0]
+        except:
+            pass
+        li = out.split("()")
         l = []
         for item in li:
             if item.startswith(" ") or item.startswith(")"):
@@ -22,16 +24,13 @@ class Gift:
                 item = item[:-1]
             if item != "":
                 l.append(item)
-        return {"giftedFrom": l[0], "giftName": l[1]}
-
-test = "I just received a gift from Mistah_Mace via Throne Gifts: Gaming Mouse Pad, Canjoy Extended Mouse Pad, 31.5x15.7inch XXL Large Big Computer Keyboard Mouse Mat Desk Pad with Non-Slip Base and Stitched Edge for Home. Thank you! https://thrn.co/u/miilkywayz #Wishlist #Throne"
+        return {"giftedFrom": l[0], "giftName": l[1], "media":l[2]}
 
 def isGift(tweet):
     patterns = [
         "I just received a gift from",
         "via Throne Gifts:",
-        "#Wishlist",
-        "#Throne"
+        " Thank you!… ",
     ]
     matches = 0
     for i in patterns:
@@ -42,6 +41,8 @@ def isGift(tweet):
     else:
         return False
 
-if isGift(test):
-    g = Gift(test)
-    print(g.parse())
+def getParse(tweet):
+    if isGift(tweet):
+        g = Gift(tweet)
+        return g.parse()
+    
